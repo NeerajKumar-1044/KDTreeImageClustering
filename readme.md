@@ -40,5 +40,6 @@ Expected Learning Outcomes:
     Develop problem-solving skills by applying advanced data structures to real-world tasks.
 
 to run code-
-    make
-    ./RunProject
+
+     make ./RunProject
+     
