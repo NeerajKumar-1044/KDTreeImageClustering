@@ -1,5 +1,6 @@
-run command
-    for mac:-
+run command-
+
+    for mac-
         make
         make clean
         ./RunProject
