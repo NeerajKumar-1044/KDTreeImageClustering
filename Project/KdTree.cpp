@@ -3,7 +3,7 @@
 #include<iostream>
 #include<queue>
 #include <cmath>
-
+#include<algorithm>
 using namespace std;
 
 TreeNode* CreateTree(vector<vector<float>>& Points, int depth){
