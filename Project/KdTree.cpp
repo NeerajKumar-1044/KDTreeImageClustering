@@ -54,7 +54,6 @@ float squareDistance(const vector<float>& p1 , const vector<float>& p2) {
     float distance = 0;
     if(p1.size()!=p2.size())return 0;
     for(int i=0;i < p1.size();i++) distance +=pow((p1[i] - p2[i]), 2);
-    distance = sqrt(distance);
     return distance;
 }
 
@@ -84,7 +83,6 @@ void findNearest(TreeNode* root, const vector<float>& target, int depth, TreeNod
     findNearest(nextBranch, target , depth+1, bestNode, bestDistance);
 
     float planeDistance  = pow(target[dim] - root->point[dim], 2);
-    planeDistance = sqrt(planeDistance);
     if(planeDistance  < bestDistance) {
         findNearest(otherBranch , target, depth+1, bestNode, bestDistance);
     }
