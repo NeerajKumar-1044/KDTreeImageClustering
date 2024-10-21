@@ -1,26 +1,37 @@
 #ifndef KDTREE
 #define KDTREE
-#include<vector>
+#include <vector>
+#include <iostream>
+#include <queue>
+#include <cmath>
+#include <algorithm>
 
 using namespace std;
 
-class TreeNode{
-    public:
-    vector<float> point;
-    TreeNode *left;
-    TreeNode *right;
-    public:
-    explicit TreeNode(const vector<float> &arr): point(arr), left(nullptr), right(nullptr) {}
+class Cluster {
+public:
+    vector<float> centroid;
+    vector<Cluster*> members;
+    float distance;
+
+    explicit Cluster(vector<float> val, vector<Cluster*> m = {}, float dis = 0.0)
+        : centroid(val), members(m), distance(dis) {}
 };
 
-// function to create KD-Tree
-TreeNode* CreateTree(vector<vector<float>>& Points, int depth);
+class TreeNode {
+public:
+    Cluster* point;
+    TreeNode* left;
+    TreeNode* right;
 
+    explicit TreeNode(Cluster* cluster) : point(cluster), left(nullptr), right(nullptr) {}
+};
 
-// function to print KD-Tree
+TreeNode* CreateTree(vector<Cluster*>& clusters, int depth = 0);
+Cluster* findNearestNeighbour(TreeNode* root, const vector<float>& target);
+
 void bfs(TreeNode* root);
-
-// to find nearest neighbour
-TreeNode* findNearestNeighbour(TreeNode* root , const vector<float>& target);
+bool DeleteKdNode(TreeNode* root, const vector<float>& target, int depth);
+void InsertKdNode(TreeNode* root, Cluster* cluster);
 
 #endif
