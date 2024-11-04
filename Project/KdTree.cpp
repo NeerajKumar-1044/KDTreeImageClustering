@@ -88,9 +88,30 @@ bool floatCompare(const vector<float>& a, const vector<float>& b) {
     return true;
 }
 
+// Helper function to find the minimum node in a given dimension
+TreeNode* findMinRec(TreeNode* root, int d, int depth) {
+    if (root == nullptr) return nullptr;
+
+    int dim = root->point->centroid.size();
+    int currentDim = depth % dim;
+
+    if (currentDim == d) {
+        if (root->left == nullptr) return root;
+        return findMinRec(root->left, d, depth + 1);
+    }
+
+    TreeNode* leftMin = findMinRec(root->left, d, depth + 1);
+    TreeNode* rightMin = findMinRec(root->right, d, depth + 1);
+
+    TreeNode* minNode = root;
+    if (leftMin && leftMin->point->centroid[d] < minNode->point->centroid[d]) minNode = leftMin;
+    if (rightMin && rightMin->point->centroid[d] < minNode->point->centroid[d]) minNode = rightMin;
+
+    return minNode;
+}
 
 
-bool DeleteKdNode(TreeNode*& root, const vector<float>& target, int depth = 0) {
+bool DeleteKdNode(TreeNode* root, const vector<float>& target, int depth=0) {
     if (root == nullptr) return false;  // Node not found
 
     int dim = target.size();
@@ -99,7 +120,7 @@ bool DeleteKdNode(TreeNode*& root, const vector<float>& target, int depth = 0) {
     // Check if the current node is the one to delete
     if (floatCompare(root->point->centroid, target)) {
         // If it has a right child
-        if (root->right != nullptr) {
+        if (root->right != nullptr){
             // Find minimum in current dimension in right subtree
             TreeNode* minNode = findMinRec(root->right, currentDim, depth + 1);
             root->point->centroid = minNode->point->centroid;
@@ -133,27 +154,7 @@ bool DeleteKdNode(TreeNode*& root, const vector<float>& target, int depth = 0) {
     }
 }
 
-// Helper function to find the minimum node in a given dimension
-TreeNode* findMinRec(TreeNode* root, int d, int depth) {
-    if (root == nullptr) return nullptr;
 
-    int dim = root->point->centroid.size();
-    int currentDim = depth % dim;
-
-    if (currentDim == d) {
-        if (root->left == nullptr) return root;
-        return findMinRec(root->left, d, depth + 1);
-    }
-
-    TreeNode* leftMin = findMinRec(root->left, d, depth + 1);
-    TreeNode* rightMin = findMinRec(root->right, d, depth + 1);
-
-    TreeNode* minNode = root;
-    if (leftMin && leftMin->point->centroid[d] < minNode->point->centroid[d]) minNode = leftMin;
-    if (rightMin && rightMin->point->centroid[d] < minNode->point->centroid[d]) minNode = rightMin;
-
-    return minNode;
-}
 
 
 void InsertKdNode(TreeNode* root, Cluster* cluster) {
