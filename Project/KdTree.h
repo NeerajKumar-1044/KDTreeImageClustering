@@ -31,7 +31,7 @@ TreeNode* CreateTree(vector<Cluster*>& clusters, int depth = 0);
 Cluster* findNearestNeighbour(TreeNode* root, const vector<float>& target);
 
 void bfs(TreeNode* root);
-bool DeleteKdNode(TreeNode* root, const vector<float>& target, int depth);
+bool DeleteKdNode(TreeNode* &root, const vector<float>& target, int depth);
 void InsertKdNode(TreeNode* root, Cluster* cluster);
 
 #endif

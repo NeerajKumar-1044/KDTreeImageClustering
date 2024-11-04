@@ -56,5 +56,9 @@ int main() {
     int numClusters = 3;
     // Cluster* cluster = hierarchicalClustering(kdTree, feature);
     bfs(kdTree);
+    cout<<"KdTree after deletion"<<endl;
+    if(DeleteKdNode(kdTree, {8,8}, 0)) cout<<"Deleted"<<endl;
+    else cout<<"Not Deleted"<<endl;
+    bfs(kdTree);
     return 0;
 }
