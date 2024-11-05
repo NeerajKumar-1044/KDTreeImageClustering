@@ -80,7 +80,7 @@ Cluster* findNearestNeighbour(TreeNode* root, const vector<float>& target) {
 }
 
 
-
+// this code is working fine
 bool floatCompare(const vector<float>& a, const vector<float>& b) {
     for (int i = 0; i < a.size(); i++) {
         if (fabs(a[i] - b[i]) > 1e-5) return false;
@@ -89,12 +89,73 @@ bool floatCompare(const vector<float>& a, const vector<float>& b) {
 }
 
 
+// this code is working fine
+TreeNode* findMinRec(TreeNode* &root, int d, int depth) {
+    if (root == nullptr) return nullptr;
 
-bool DeleteKdNode(TreeNode* root, const vector<float>& target, int depth = 0) {
-    // Implement deletion logic (similar to insertion but with rebalancing)
-    
-    return false;  // Placeholder
+    int dim = root->point->centroid.size();
+    int currentDim = depth % dim;
+
+    if (currentDim == d) {
+        if (root->left == nullptr) return root;
+        return findMinRec(root->left, d, depth + 1);
+    }
+
+    TreeNode* leftMin = findMinRec(root->left, d, depth + 1);
+    TreeNode* rightMin = findMinRec(root->right, d, depth + 1);
+
+    TreeNode* minNode = root;
+    if (leftMin && leftMin->point->centroid[d] < minNode->point->centroid[d]) minNode = leftMin;
+    if (rightMin && rightMin->point->centroid[d] < minNode->point->centroid[d]) minNode = rightMin;
+
+    return minNode;
 }
+
+// this code is working fine
+bool DeleteKdNode(TreeNode* &root, const vector<float>& target, int depth=0) {
+    if (root == nullptr) return false;
+
+    int dim = target.size();
+    int currentDim = depth % dim;
+
+
+    if (floatCompare(root->point->centroid, target)) {
+
+        if (root->right != nullptr){
+
+            TreeNode* minNode = findMinRec(root->right, currentDim, depth + 1);
+            root->point->centroid = minNode->point->centroid;
+
+
+            return DeleteKdNode(root->right, minNode->point->centroid, depth + 1);
+        }
+
+        else if (root->left != nullptr) {
+            TreeNode* minNode = findMinRec(root->left, currentDim, depth + 1);
+            root->point->centroid = minNode->point->centroid;
+
+
+            root->right = root->left;
+            root->left = nullptr;
+            return DeleteKdNode(root->right, minNode->point->centroid, depth + 1);
+        }
+
+        else {
+            delete root;
+            root = nullptr;
+            return true;
+        }
+    }
+
+
+    if (target[currentDim] < root->point->centroid[currentDim]) {
+        return DeleteKdNode(root->left, target, depth + 1);
+    } else {
+        return DeleteKdNode(root->right, target, depth + 1);
+    }
+}
+
+
 
 void InsertKdNode(TreeNode* root, Cluster* cluster) {
     if (root == nullptr) return;
@@ -121,7 +182,6 @@ void InsertKdNode(TreeNode* root, Cluster* cluster) {
         depth++;
     }
 }
-
 
 
 // this code is working fine
