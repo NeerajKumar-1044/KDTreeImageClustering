@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Search</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* Title */
+        h1, h2 {
+            color: #444;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Form Styling */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        input[type="file"],
+        input[type="number"],
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Status Text */
+        #uploadStatus,
+        #searchStatus {
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* Gallery */
+        #resultGallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #resultGallery img {
+            width: 150px;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        #resultGallery img:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Upload an Image</h1>
+        <div class="form-group">
+            <input type="file" id="uploadImageInput" accept="image/*">
+        </div>
+        <button id="uploadButton">Upload</button>
+        <p id="uploadStatus"></p>
+    </div>
+
+    <div class="container">
+        <h1>Search for Similar Images</h1>
+        <div class="form-group">
+            <input type="file" id="searchImageInput" accept="image/*">
+        </div>
+        <div class="form-group">
+            <input type="number" id="numResults" placeholder="Number of results" min="1">
+        </div>
+        <button id="searchButton">Search</button>
+        <p id="searchStatus"></p>
+    </div>
+
+    <h2>Results</h2>
+    <div id="resultGallery"></div>
+
+    <script src="index.js"></script>
+</body>
+</html>
