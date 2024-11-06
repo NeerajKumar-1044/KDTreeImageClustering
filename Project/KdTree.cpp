@@ -124,17 +124,13 @@ bool DeleteKdNode(TreeNode* &root, const vector<float>& target, int depth=0) {
         if (root->right != nullptr){
 
             TreeNode* minNode = findMinRec(root->right, currentDim, depth + 1);
-            root->point->centroid = minNode->point->centroid;
-
-
+            root->point = minNode->point;
             return DeleteKdNode(root->right, minNode->point->centroid, depth + 1);
         }
 
         else if (root->left != nullptr) {
             TreeNode* minNode = findMinRec(root->left, currentDim, depth + 1);
-            root->point->centroid = minNode->point->centroid;
-
-
+            root->point = minNode->point;
             root->right = root->left;
             root->left = nullptr;
             return DeleteKdNode(root->right, minNode->point->centroid, depth + 1);

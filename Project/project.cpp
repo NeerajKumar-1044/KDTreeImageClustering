@@ -1,7 +1,13 @@
-#include<iostream>
-#include "KdTree.h"
+#include <iostream>
+#include <fstream>
+#include <vector>
 #include <queue>
-#include <algorithm>
+#include <string>
+#include <set>
+#include <unordered_map>
+#include "KdTree.cpp"
+#include "KdTree.h"
+#include <cmath> 
 
 using namespace std;
 
@@ -11,6 +17,49 @@ vector<float> CalculateCentroid(vector<float>&a, vector<float>&b){
         centroid.push_back((a[i]+b[i])/2);
     }
     return centroid;
+}
+void print(Cluster* c, int depth = 0) {
+    for (int i = 0; i < depth; ++i) {
+        cout << "    "; // Add 4 spaces for each level of depth
+    }
+
+    if (c->members.empty()) {
+        // Leaf cluster, print the centroid
+        cout << "Centroid: ";
+        for (float value : c->centroid) {
+            cout << value << " ";
+        }
+        cout << endl;
+    } else {
+        cout << "centroid :" ;
+        for (float value : c->centroid) {
+            cout << value << " ";
+        }
+        cout << endl;
+        cout << "Members :" << endl;
+        // Print members with increased depth
+        for (Cluster* member : c->members) {
+            print(member, depth + 1);
+        }
+    }
+}
+
+void removeClusterFromQueue(queue<Cluster*>& q, Cluster* clusterToRemove) {
+    queue<Cluster*> tempQueue;
+
+    // Transfer elements to tempQueue, skipping the cluster to remove
+    while (!q.empty()) {
+        Cluster* currentCluster = q.front();
+        q.pop();
+
+        // Check if the current cluster is the one to remove
+        if (currentCluster != clusterToRemove) {
+            tempQueue.push(currentCluster);
+        }
+    }
+
+    // Replace the original queue with the filtered one
+    q = tempQueue;
 }
 
 Cluster* hierarchicalClustering(TreeNode* kdTree, vector<Cluster*> feature) {
@@ -23,12 +72,15 @@ Cluster* hierarchicalClustering(TreeNode* kdTree, vector<Cluster*> feature) {
         q.pop();
         if(DeleteKdNode(kdTree, c1->centroid, 0)){
             Cluster* c2 = findNearestNeighbour(kdTree, c1->centroid);
+            removeClusterFromQueue(q, c2);
             if(!DeleteKdNode(kdTree, c2->centroid, 0))continue;
             vector<float> centroid = CalculateCentroid(c1->centroid, c2->centroid);
             Cluster* newCluster = new Cluster(centroid);
             newCluster->members.push_back(c1);
             newCluster->members.push_back(c2);
             q.push(newCluster);
+             print(newCluster);
+             cout << endl;
             InsertKdNode(kdTree, newCluster);
         }
         else continue;
@@ -53,12 +105,11 @@ int main() {
     }
     TreeNode* kdTree = CreateTree(feature, 0);
     // Perform hierarchical clustering
-    int numClusters = 3;
-    // Cluster* cluster = hierarchicalClustering(kdTree, feature);
-    bfs(kdTree);
-    cout<<"KdTree after deletion"<<endl;
-    if(DeleteKdNode(kdTree, {8,8}, 0)) cout<<"Deleted"<<endl;
-    else cout<<"Not Deleted"<<endl;
-    bfs(kdTree);
+    Cluster* cluster = hierarchicalClustering(kdTree, feature);
+    // bfs(kdTree);
+    // cout<<"KdTree after deletion"<<endl;
+    // if(DeleteKdNode(kdTree, {8,8}, 0)) cout<<"Deleted"<<endl;
+    // else cout<<"Not Deleted"<<endl;
+    // bfs(kdTree);
     return 0;
 }
