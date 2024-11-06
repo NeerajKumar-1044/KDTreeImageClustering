@@ -8,8 +8,15 @@
 #include "KdTree.cpp"
 #include "KdTree.h"
 #include <cmath> 
+#include "json.hpp"
 
 using namespace std;
+using json = nlohmann::json;
+
+unordered_map<string, vector<float>> features;
+set<string> final;
+string target;
+int num;
 
 vector<float> CalculateCentroid(vector<float>&a, vector<float>&b){
     vector<float> centroid;
@@ -18,6 +25,51 @@ vector<float> CalculateCentroid(vector<float>&a, vector<float>&b){
     }
     return centroid;
 }
+
+bool areVectorsEqual(const vector<float>& a, const vector<float>& b, float epsilon = 1e-5) {
+    if (a.size() != b.size()) return false;
+
+    for (size_t i = 0; i < a.size(); ++i) {
+        if (std::fabs(a[i] - b[i]) > epsilon) {
+            return false;
+        }
+    }
+    return true;
+}
+
+string getKeyFromValue(const vector<float>& value, float epsilon = 1e-5) {
+    for (const auto& pair : features) {
+        if (areVectorsEqual(pair.second, value, epsilon)) {
+            return pair.first; 
+        }
+    }
+    return ""; 
+}
+
+bool check(Cluster* cluster) {
+    if (cluster->members.size() == 0) {
+        return getKeyFromValue(cluster->centroid) == target;
+    }
+    for (auto it : cluster->members) {
+       if(check(it)) return true;
+    }
+    return false;
+}
+
+void func(Cluster* cluster) {
+    if (final.size()==num) return;
+    if (cluster->members.size() == 0) {
+        if(getKeyFromValue(cluster->centroid) != target){
+        final.insert(getKeyFromValue(cluster->centroid));
+        }
+        return;
+    }
+    for (auto it : cluster->members) {
+        func(it);
+        if(final.size()==num) break;
+    }
+}
+
 void print(Cluster* c, int depth = 0) {
     for (int i = 0; i < depth; ++i) {
         cout << "    "; // Add 4 spaces for each level of depth
@@ -79,8 +131,11 @@ Cluster* hierarchicalClustering(TreeNode* kdTree, vector<Cluster*> feature) {
             newCluster->members.push_back(c1);
             newCluster->members.push_back(c2);
             q.push(newCluster);
-             print(newCluster);
-             cout << endl;
+            // print(newCluster);
+            // cout << endl;
+            if( check(newCluster)){
+            func(newCluster);            
+           }
             InsertKdNode(kdTree, newCluster);
         }
         else continue;
@@ -93,23 +148,55 @@ Cluster* hierarchicalClustering(TreeNode* kdTree, vector<Cluster*> feature) {
 }
 
 int main() {
+ifstream inputFile("output.json");
+    if (!inputFile.is_open()) {
+        cerr << "Could not open the file: output.json" << endl;
+        return -1;
+    }
+    
+    json data;
+    inputFile >> data;
+   
 
-    // vector<vector<float>> features;
-    vector<vector<float>>features = {{1,9},{2,3},{4,1},{3,7},{5,4},{6,8},{7,2},{8,8},{7,9},{9,6}};
+    // Populate features map from JSON data
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        string imageID = it.key();
+        vector<float> featureVector = it.value().get<vector<float>>();
+        features[imageID] = featureVector;
+    }
 
-    // Build KD-Tree from features
+    ifstream inputOutputFile("input.json");
+    if (!inputOutputFile.is_open()) {
+        cerr << "Could not open the file: input.json" << endl;
+        return -1;
+    }
+
+    // Parse JSON data
+    json ioData;
+    inputOutputFile >> ioData;
+
+    target = ioData["target"].get<string>();
+    num = ioData["num"].get<int>();
+    
+    cout << "Target: " << target << endl;
+    cout << "Num: " << num << endl;
     vector<Cluster*> feature;
-    for(auto it: features){
-        Cluster* temp = new Cluster(it);
-        feature.push_back(temp);
+    for(auto it:features){
+        feature.push_back(new Cluster(it.second));
     }
     TreeNode* kdTree = CreateTree(feature, 0);
-    // Perform hierarchical clustering
     Cluster* cluster = hierarchicalClustering(kdTree, feature);
-    // bfs(kdTree);
-    // cout<<"KdTree after deletion"<<endl;
-    // if(DeleteKdNode(kdTree, {8,8}, 0)) cout<<"Deleted"<<endl;
-    // else cout<<"Not Deleted"<<endl;
-    // bfs(kdTree);
+    json jsonData;
+    jsonData["numbers"] = final; 
+    ofstream outFile("input.json");
+    if (!outFile.is_open()) {
+        cerr << "Could not open the file for writing" << endl;
+        return -1;
+    }
+
+    outFile << jsonData.dump(4); // Pretty-print with 4-space indentation
+    outFile.close();
+
+    cout << "Array successfully stored in data.json" << endl;
     return 0;
 }
