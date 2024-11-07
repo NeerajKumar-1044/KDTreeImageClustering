@@ -103,86 +103,69 @@ Cluster* findNearestNeighbour(TreeNode* root, const vector<float>& target) {
 }
 
 
-// Helper function to compare if two points are approximately equal
-bool floatCompare(const vector<float>& a, const vector<float>& b, float epsilon = 1e-6) {
-    if (a.size() != b.size()) return false;
-    for (size_t i = 0; i < a.size(); i++) {
-        if (fabs(a[i] - b[i]) > epsilon) return false;
+// this code is working fine
+bool floatCompare(const vector<float>& a, const vector<float>& b) {
+    for (int i = 0; i < a.size(); i++) {
+        if (fabs(a[i] - b[i]) > 1e-5) return false;
     }
     return true;
 }
 
 
+// this code is working fine
+TreeNode* findMinRec(TreeNode* &root, int d, int depth) {
+    if (root == nullptr) return nullptr;
 
-// Insert a node in the KD-Tree
-void InsertKdNode(TreeNode*& root, Cluster* point, int depth = 0) {
-    if (!root) {
-        root = new TreeNode(point);
-        return;
-    }
-
-    int dim = point->centroid.size();
+    int dim = root->point->centroid.size();
     int currentDim = depth % dim;
 
-    if (point->centroid[currentDim] < root->point->centroid[currentDim]) {
-        InsertKdNode(root->left, point, depth + 1);
-    } else {
-        InsertKdNode(root->right, point, depth + 1);
-    }
-}
-
-
-
-// Find the minimum node for a specific dimension
-TreeNode* findMinRec(TreeNode* root, int dim, int depth = 0) {
-    if (!root) return nullptr;
-
-    int currentDim = depth % root->point->centroid.size();
-
-    if (currentDim == dim) {
+    if (currentDim == d) {
         if (root->left == nullptr) return root;
-        return findMinRec(root->left, dim, depth + 1);
+        return findMinRec(root->left, d, depth + 1);
     }
 
-    TreeNode* leftMin = findMinRec(root->left, dim, depth + 1);
-    TreeNode* rightMin = findMinRec(root->right, dim, depth + 1);
+    TreeNode* leftMin = findMinRec(root->left, d, depth + 1);
+    TreeNode* rightMin = findMinRec(root->right, d, depth + 1);
 
     TreeNode* minNode = root;
-    if (leftMin && leftMin->point->centroid[dim] < minNode->point->centroid[dim]) {
-        minNode = leftMin;
-    }
-    if (rightMin && rightMin->point->centroid[dim] < minNode->point->centroid[dim]) {
-        minNode = rightMin;
-    }
+    if (leftMin && leftMin->point->centroid[d] < minNode->point->centroid[d]) minNode = leftMin;
+    if (rightMin && rightMin->point->centroid[d] < minNode->point->centroid[d]) minNode = rightMin;
+
     return minNode;
 }
 
-
-
-// Delete a node in the KD-Tree
-bool DeleteKdNode(TreeNode*& root, const vector<float>& target, int depth = 0) {
-    if (!root) return false;
+// this code is working fine
+bool DeleteKdNode(TreeNode* &root, const vector<float>& target, int depth=0) {
+    if (root == nullptr) return false;
 
     int dim = target.size();
     int currentDim = depth % dim;
 
+
     if (floatCompare(root->point->centroid, target)) {
-        if (root->right != nullptr) {
+
+        if (root->right != nullptr){
+
             TreeNode* minNode = findMinRec(root->right, currentDim, depth + 1);
-            root->point->centroid = minNode->point->centroid;
+            root->point = minNode->point;
             return DeleteKdNode(root->right, minNode->point->centroid, depth + 1);
-        } else if (root->left != nullptr) {
+        }
+
+        else if (root->left != nullptr) {
             TreeNode* minNode = findMinRec(root->left, currentDim, depth + 1);
-            root->point->centroid = minNode->point->centroid;
+            root->point = minNode->point;
             root->right = root->left;
             root->left = nullptr;
             return DeleteKdNode(root->right, minNode->point->centroid, depth + 1);
-        } else {
+        }
+
+        else {
             delete root;
             root = nullptr;
             return true;
         }
     }
+
 
     if (target[currentDim] < root->point->centroid[currentDim]) {
         return DeleteKdNode(root->left, target, depth + 1);
@@ -192,35 +175,64 @@ bool DeleteKdNode(TreeNode*& root, const vector<float>& target, int depth = 0) {
 }
 
 
+// this code is working fine
+void InsertKdNode(TreeNode* root, Cluster* cluster) {
+    if (root == nullptr) return;
 
-// Print KD-Tree using BFS
-void bfs(TreeNode* root) {
+    int dim = root->point->centroid.size();
+    int depth = 0;
+    TreeNode* current = root;
 
-    if (!root) {
-        cout << "Root not found" << endl;
-        return;
+    while (current) {
+        int currentDim = depth % dim;
+        if (cluster->centroid[currentDim] < current->point->centroid[currentDim]) {
+            if (current->left == nullptr) {
+                current->left = new TreeNode(cluster);
+                return;
+            }
+            current = current->left;
+        } else {
+            if (current->right == nullptr) {
+                current->right = new TreeNode(cluster);
+                return;
+            }
+            current = current->right;
+        }
+        depth++;
     }
-    queue<TreeNode*> q;
-
-    q.push(root);
-    while (!q.empty()) {
-        int n = q.size();
-        for(int i=0;i<n;i++){
-            TreeNode* temp = q.front();
-            q.pop();
-            cout << "{ ";
-            for (auto val : temp->point->centroid) cout << val << " ";
-            cout << "} ";
-            if (temp->left) q.push(temp->left);
-            if (temp->right) q.push(temp->right);
-        }cout<<endl;
-    }
-    cout << endl;
 }
 
 
+// this code is working fine
+void bfs(TreeNode* root) {
+    if (root == nullptr) {
+        cerr << "Root not found" << endl;
+        return;
+    }
 
+    queue<TreeNode*> q;
+    q.push(root);
 
+    while (!q.empty()) {
+        int n = q.size();
+        for (int i = 0; i < n; i++) {
+            TreeNode* temp = q.front();
+            q.pop();
+
+            cout << "{";
+            for (float val : temp->point->centroid) {
+                cout << val << " ";
+            }
+            cout << "} ";
+
+            if (temp->left != nullptr) q.push(temp->left);
+            if (temp->right != nullptr) q.push(temp->right);
+        }
+        cout << endl;
+    }
+}
+
+// this code is working fine
 void PrintCluster(Cluster* cluster) {
     if (cluster == nullptr) {
         cout << "Cluster not found" << endl;
@@ -253,3 +265,4 @@ void PrintCluster(Cluster* cluster) {
 }
 
 #endif
+
