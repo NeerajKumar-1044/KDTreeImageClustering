@@ -7,13 +7,19 @@ This project implements a hierarchical clustering algorithm for image recognitio
 1. **Clone the Repository**
    ```bash
    git clone https://github.com/NeerajKumar-1044/KDTreeImageClustering.git
+   
+2. ***Install dependencies:-***
+   ```bash
    cd KDTreeImageClustering/Project
+   npm i
 
-npm install express cors
+3. ***Compile C++ Files***
+   ```bash
+   g++ histogram.cpp -o histogram ./histogram
+   g++ project.cpp -o project ./project
 
-g++ histogram.cpp -o histogram
-g++ project.cpp -o project
+4. ***Start server***
 
-node server
+   npm run start
 
-http://localhost:8000
+Go to - http://localhost:8000

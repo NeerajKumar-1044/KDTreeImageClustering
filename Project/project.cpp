@@ -5,8 +5,7 @@
 #include <string>
 #include <set>
 #include <unordered_map>
-#include "KdTree.cpp"
-#include "KdTree.h"
+#include "KdTree.hpp"
 #include <cmath> 
 #include "json.hpp"
 
