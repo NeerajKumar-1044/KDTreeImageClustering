@@ -30,6 +30,7 @@ const upload = multer({ storage: storage });
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+app.use('/Images', express.static('Images'));
 
 // Utility function to execute a command with a promise
 function runCommand(command) {

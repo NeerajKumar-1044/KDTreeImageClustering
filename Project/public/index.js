@@ -10,20 +10,18 @@ const numResultsInput = document.getElementById('numResults');
 const searchStatus = document.getElementById('searchStatus');
 const resultGallery = document.getElementById('resultGallery'); 
 
-// Function to display search results in the gallery
 function displayResults(images) {
-   
     resultGallery.innerHTML = ''; // Clear any existing images
-
-    numbers.forEach(imagePath => {
+    images.forEach(imagePath => {
         const img = document.createElement('img');
-        img.src = `/Images/${imagePath}`;
+        img.src = `http://localhost:8000/Images/${imagePath}`;
         img.alt = imagePath;
         img.style.maxWidth = '150px'; // Adjust size as needed
         img.style.margin = '5px';
         resultGallery.appendChild(img);
     });
 }
+
 function uploadImage(file, isSearch) {
     const formData = new FormData();
     formData.append('image', file); // Attach the image file
@@ -38,7 +36,7 @@ function uploadImage(file, isSearch) {
         formData.append('number', number); // Add number of results to formData
         searchStatus.textContent = 'Searching for similar images...';
     } else {
-        uploadStatus.textContent = 'Uploading image...';
+        uploadStatus.textContent = 'Image Uploaded Succesfully';
     }
 
     const endpoint = isSearch ? "http://localhost:8000/search" : "http://localhost:8000/upload";
@@ -65,8 +63,7 @@ function uploadImage(file, isSearch) {
         } else {
             searchStatus.textContent = 'No results ';
         }
-    } else {
-        
+    } else {        
         uploadStatus.textContent = data.message;
     }
     })
