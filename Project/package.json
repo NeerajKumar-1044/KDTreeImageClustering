@@ -1,0 +1,20 @@
+{
+  "name": "json",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "cors": "^2.8.5",
+    "detect-port": "^1.6.1",
+    "express": "^4.21.1",
+    "multer": "^1.4.5-lts.1"
+  }
+}
